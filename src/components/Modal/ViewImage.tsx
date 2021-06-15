@@ -1,4 +1,5 @@
 import {
+  Flex,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -6,6 +7,7 @@ import {
   ModalBody,
   Image,
   Link,
+  Text
 } from '@chakra-ui/react';
 
 interface ModalViewImageProps {
@@ -19,5 +21,20 @@ export function ModalViewImage({
   onClose,
   imgUrl,
 }: ModalViewImageProps): JSX.Element {
-  // TODO MODAL WITH IMAGE AND EXTERNAL LINK
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay opacity={50}>
+        <ModalContent>
+          <ModalBody>
+            <Image src={imgUrl} maxH={600} maxWidth={900} />
+          </ModalBody>
+          <ModalFooter bgColor='gray.800'>
+            <Text as='a' href={imgUrl} fontFamily='sm' color='gray.50'>
+              Abrir original
+            </Text>
+          </ModalFooter>
+        </ModalContent>
+      </ModalOverlay>
+    </Modal>
+  )
 }
