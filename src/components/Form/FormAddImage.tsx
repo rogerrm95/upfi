@@ -11,7 +11,13 @@ interface FormAddImageProps {
   closeModal: () => void;
 }
 
-const regexToTypeOfImage = '/(image/(jpeg|gif|png|jpg))/g'
+interface ImageFormData {
+  image: unknown,
+  description: string,
+  title: string
+}
+
+const regexToTypeOfImage = '/(image/(jpeg|gif|png|jpg))/g';
 
 export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
   const [imageUrl, setImageUrl] = useState('');
@@ -22,8 +28,10 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
     image: {
       required: "Arquivo obrigatório",
       validate: {
-        lessThan10MB: image => image[0].size < 10 * 1024 * 1024 || "O arquivo deve ser menor que 10MB",
-        acceptedFormats: image => image[0].type !== regexToTypeOfImage || "Somente são aceitos arquivos PNG, JPEG e GIF"
+        lessThan10MB: image =>
+          image[0].size < 10 * 1024 * 1024 || "O arquivo deve ser menor que 10MB",
+        acceptedFormats: image =>
+        image => image[0].type !== regexToTypeOfImage || "Somente são aceitos arquivos PNG, JPEG e GIF"
       }
     },
     title: {
@@ -39,8 +47,13 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
 
   const queryClient = useQueryClient();
   const mutation = useMutation(
-    async (formData: Record<string, unknown>) => {
-      return await api.post('api/images', formData)
+    async (data: ImageFormData) => {
+      const response = await api.post('/images',{
+        url: imageUrl,
+        title: data.title,
+        description: data.description
+      })
+      return response.data;
     },
     {
       onSuccess: () => queryClient.invalidateQueries('images')
@@ -57,7 +70,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
   } = useForm();
   const { errors } = formState;
 
-  const onSubmit = async (data: Record<string, unknown>): Promise<void> => {
+  const onSubmit = async (data: ImageFormData): Promise<void> => {
     try {
       if (!data.image) {
         toast({
@@ -67,10 +80,12 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
           duration: 7000,
           isClosable: true
         })
+
+        return;
       }
 
-      await mutation.mutateAsync
-      
+      await mutation.mutateAsync(data)
+
       toast({
         title: "Imagem cadastrada",
         description: "Sua imagem foi cadastrada com sucesso.",
@@ -79,6 +94,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
         isClosable: true
       })
 
+      return;
     } catch {
       toast({
         title: "Falha no cadastro",
@@ -88,9 +104,9 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
         isClosable: true
       })
     } finally {
-      // TODO CLEAN FORM, STATES AND CLOSE MODAL
-      setImageUrl('')
+      reset(data)
       setLocalImageUrl('')
+      setImageUrl('')
       closeModal()
     }
   };
@@ -104,20 +120,20 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
           setLocalImageUrl={setLocalImageUrl}
           setError={setError}
           trigger={trigger}
-          {...register('image', formValidations.image)}
           error={errors.image}
+          {...register('image', formValidations.image)}
         />
 
         <TextInput
           placeholder="Título da imagem..."
-          {...register('title', formValidations.title)}
           error={errors.title}
+          {...register('title', formValidations.title)}
         />
 
         <TextInput
           placeholder="Descrição da imagem..."
-          {...register('description', formValidations.description)}
           error={errors.description}
+          {...register('description', formValidations.description)}
         />
       </Stack>
 

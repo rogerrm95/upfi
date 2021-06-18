@@ -31,22 +31,20 @@ export default function Home(): JSX.Element {
     hasNextPage,
   } = useInfiniteQuery(
     'images', async ({ pageParam = null }) => {
-      const data = await api.get<AxiosResponse>('api/images', { params: { after: pageParam } })
+      const {data} = await api.get('/images', { params: { after: pageParam } })
       return data
     }, {
-    getNextPageParam: nextPage => nextPage.data.after ?? null
+    getNextPageParam: nextPage => nextPage.after ?? null
   }
 
   );
 
   const formattedData = useMemo(() => {
-    return data?.pages.flatMap(page => page.data.data)
+    return data?.pages.flatMap(page => page.data)
   }, [data]);
 
-  console.log(formattedData)
-
-  if (isLoading) return <Loading />
-  if (isError) return <Error />
+  //if (isLoading) return <Loading />
+  //if (isError) return <Error />
 
   return (
     <>
