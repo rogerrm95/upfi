@@ -17,7 +17,7 @@ interface ImageFormData {
   title: string
 }
 
-const regexToTypeOfImage = '/(image/(jpeg|gif|png|jpg))/g';
+const regexImageFormat = new RegExp('^image\\/(gif|jpeg|png)$')
 
 export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
   const [imageUrl, setImageUrl] = useState('');
@@ -28,10 +28,8 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
     image: {
       required: "Arquivo obrigatório",
       validate: {
-        lessThan10MB: image =>
-          image[0].size < 10 * 1024 * 1024 || "O arquivo deve ser menor que 10MB",
-        acceptedFormats: image =>
-        image => image[0].type !== regexToTypeOfImage || "Somente são aceitos arquivos PNG, JPEG e GIF"
+        lessThan10MB: fileList => fileList[0].size < 10 * 1024 * 1024 || "O arquivo deve ser menor que 10MB",
+        acceptedFormats: fileList => regexImageFormat.test(fileList[0].type) || "Somente são aceitos arquivos PNG, JPEG e GIF",
       }
     },
     title: {
@@ -48,7 +46,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
   const queryClient = useQueryClient();
   const mutation = useMutation(
     async (data: ImageFormData) => {
-      const response = await api.post('/images',{
+      const response = await api.post('/images', {
         url: imageUrl,
         title: data.title,
         description: data.description
@@ -77,8 +75,6 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
           title: "Imagem não adicionada",
           description: "É preciso adicionar e aguardar o upload de uma imagem antes de realizar o cadastro.",
           status: 'error',
-          duration: 7000,
-          isClosable: true
         })
 
         return;
@@ -90,8 +86,6 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
         title: "Imagem cadastrada",
         description: "Sua imagem foi cadastrada com sucesso.",
         status: 'success',
-        duration: 7000,
-        isClosable: true
       })
 
       return;
@@ -100,8 +94,6 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
         title: "Falha no cadastro",
         description: "Ocorreu um erro ao tentar cadastrar a sua imagem.",
         status: 'warning',
-        duration: 7000,
-        isClosable: true
       })
     } finally {
       reset(data)
@@ -120,8 +112,8 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
           setLocalImageUrl={setLocalImageUrl}
           setError={setError}
           trigger={trigger}
-          error={errors.image}
           {...register('image', formValidations.image)}
+          error={errors.image}
         />
 
         <TextInput

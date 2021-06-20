@@ -47,8 +47,8 @@ export function Card({ data, viewImage }: CardProps): JSX.Element {
           </>
         ) : (
           <>
-            <Heading fontSize="2xl">{data.title}</Heading>
-            <Text mt={2.5} fontSize="md">
+            <Heading fontSize="2xl" color='gray.50'>{data.title}</Heading>
+            <Text mt={2.5} fontSize="md" color='gray.100'>
               {data.description}
             </Text>
           </>

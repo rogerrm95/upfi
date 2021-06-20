@@ -31,20 +31,28 @@ export default function Home(): JSX.Element {
     hasNextPage,
   } = useInfiniteQuery(
     'images', async ({ pageParam = null }) => {
-      const {data} = await api.get('/images', { params: { after: pageParam } })
+      const {data} = await api.get('api/images', { 
+        params: {
+          after: pageParam
+        }
+      })
       return data
     }, {
-    getNextPageParam: nextPage => nextPage.after ?? null
+    getNextPageParam: nextPage => nextPage.after || null
   }
 
   );
 
+  async function loadMoreImages(): Promise<void>{
+    await fetchNextPage()
+  }
+
   const formattedData = useMemo(() => {
-    return data?.pages.flatMap(page => page.data)
+    return data?.pages.map(page => page.data).flat()
   }, [data]);
 
-  //if (isLoading) return <Loading />
-  //if (isError) return <Error />
+  if (isLoading) return <Loading />
+  if (isError) return <Error />
 
   return (
     <>
@@ -54,11 +62,11 @@ export default function Home(): JSX.Element {
         <CardList cards={formattedData} />
 
         {hasNextPage && (
-          <Button 
-            disabled={isFetchingNextPage}
-            onClick={() => fetchNextPage()}>
+          <Button
+            mt='10'
+            onClick={loadMoreImages}>
             {
-              isFetchingNextPage ? 'Carregando' : 'Carregar mais...'
+              isFetchingNextPage ? 'Carregando...' : 'Carregar mais'
             }
           </Button>
         )}
