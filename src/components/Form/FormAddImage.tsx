@@ -105,7 +105,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
 
   return (
     <Box as="form" width="100%" onSubmit={handleSubmit(onSubmit)}>
-      <Stack spacing={4}>
+      <Stack spacing={[8, 6, 4]}>
         <FileInput
           setImageUrl={setImageUrl}
           localImageUrl={localImageUrl}

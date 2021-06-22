@@ -31,7 +31,7 @@ export default function Home(): JSX.Element {
     hasNextPage,
   } = useInfiniteQuery(
     'images', async ({ pageParam = null }) => {
-      const {data} = await api.get('api/images', { 
+      const {data} = await api.get('/images', { 
         params: {
           after: pageParam
         }

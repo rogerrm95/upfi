@@ -5,6 +5,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 
 import { FormAddImage } from '../Form/FormAddImage';
@@ -22,15 +23,17 @@ export function ModalAddImage({
     onClose();
   };
 
+  const size = useBreakpointValue(['full', 'xl', '2xl', '3xl'])
+
   return (
-    <Modal isOpen={isOpen} onClose={handleCloseModal} isCentered size="4xl">
+    <Modal isOpen={isOpen} onClose={handleCloseModal} isCentered size={size}>
       <ModalOverlay />
       <ModalContent bgColor="pGray.900">
         <ModalHeader fontSize="4xl">Nova imagem</ModalHeader>
 
         <ModalCloseButton />
 
-        <ModalBody px={60}>
+        <ModalBody px={[10, 16, 40]}>
           <FormAddImage closeModal={handleCloseModal} />
         </ModalBody>
       </ModalContent>
